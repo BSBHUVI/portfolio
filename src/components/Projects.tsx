@@ -1,9 +1,23 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FaGithub, FaExternalLinkAlt, FaNpm } from 'react-icons/fa';
 import { SiNodedotjs, SiTypescript, SiJavascript } from 'react-icons/si';
 
 const Projects: React.FC = () => {
+  const [isMobile, setIsMobile] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  useEffect(() => {
+    setIsMobile(window.innerWidth <= 768);
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReducedMotion(mediaQuery.matches);
+
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const shouldUseSimpleAnimations = isMobile || prefersReducedMotion;
   const projects = [
     {
       title: 'QuickCMD',
@@ -64,18 +78,18 @@ const Projects: React.FC = () => {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.2,
+        staggerChildren: shouldUseSimpleAnimations ? 0.1 : 0.2,
       },
     },
   };
 
   const itemVariants = {
-    hidden: { y: 30, opacity: 0 },
+    hidden: { y: shouldUseSimpleAnimations ? 10 : 30, opacity: 0 },
     visible: {
       y: 0,
       opacity: 1,
       transition: {
-        duration: 0.5,
+        duration: shouldUseSimpleAnimations ? 0.3 : 0.5,
       },
     },
   };
@@ -100,7 +114,7 @@ const Projects: React.FC = () => {
         variants={containerVariants}
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true, amount: 0.3 }}
+        viewport={{ once: true, amount: shouldUseSimpleAnimations ? 0.1 : 0.3 }}
       >
         <motion.div className="text-center mb-16" variants={itemVariants}>
           <h2 className="text-4xl md:text-5xl font-bold mb-4">
@@ -118,7 +132,7 @@ const Projects: React.FC = () => {
               key={project.title}
               className="bg-white rounded-2xl shadow-lg overflow-hidden card-hover group"
               variants={itemVariants}
-              whileHover={{ y: -10 }}
+              whileHover={shouldUseSimpleAnimations ? {} : { y: -10 }}
             >
               {/* Project Header */}
               <div className={`h-32 bg-gradient-to-r ${project.color} relative overflow-hidden`}>
@@ -130,8 +144,8 @@ const Projects: React.FC = () => {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="bg-white/20 p-2 rounded-full text-white hover:bg-white/30 transition-colors"
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
+                      whileHover={shouldUseSimpleAnimations ? {} : { scale: 1.1 }}
+                      whileTap={{ scale: 0.95 }}
                     >
                       <FaGithub />
                     </motion.a>
@@ -142,8 +156,8 @@ const Projects: React.FC = () => {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="bg-white/20 p-2 rounded-full text-white hover:bg-white/30 transition-colors"
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
+                      whileHover={shouldUseSimpleAnimations ? {} : { scale: 1.1 }}
+                      whileTap={{ scale: 0.95 }}
                     >
                       <FaNpm />
                     </motion.a>
@@ -154,8 +168,8 @@ const Projects: React.FC = () => {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="bg-white/20 p-2 rounded-full text-white hover:bg-white/30 transition-colors"
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
+                      whileHover={shouldUseSimpleAnimations ? {} : { scale: 1.1 }}
+                      whileTap={{ scale: 0.95 }}
                     >
                       <FaExternalLinkAlt />
                     </motion.a>

@@ -1,26 +1,45 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FaGithub, FaLinkedin, FaEnvelope, FaNpm } from 'react-icons/fa';
 
 const Hero: React.FC = () => {
+  const [isMobile, setIsMobile] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  useEffect(() => {
+    // Check for mobile device
+    setIsMobile(window.innerWidth <= 768);
+    
+    // Check for reduced motion preference
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReducedMotion(mediaQuery.matches);
+
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Simplified animations for mobile and reduced motion users
+  const shouldUseSimpleAnimations = isMobile || prefersReducedMotion;
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.3,
-        delayChildren: 0.2,
+        staggerChildren: shouldUseSimpleAnimations ? 0.1 : 0.3,
+        delayChildren: shouldUseSimpleAnimations ? 0 : 0.2,
       },
     },
   };
 
   const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
+    hidden: { y: shouldUseSimpleAnimations ? 10 : 20, opacity: 0 },
     visible: {
       y: 0,
       opacity: 1,
       transition: {
-        duration: 0.5,
+        duration: shouldUseSimpleAnimations ? 0.3 : 0.5,
       },
     },
   };
@@ -30,12 +49,17 @@ const Hero: React.FC = () => {
       id="home"
       className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50 relative overflow-hidden"
     >
-      {/* Background Animation */}
-      <div className="absolute inset-0">
-        <div className="absolute top-10 left-10 w-72 h-72 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
-        <div className="absolute top-10 right-10 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
-        <div className="absolute -bottom-8 left-20 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
-      </div>
+      {/* Background Animation - Simplified for mobile */}
+      {!shouldUseSimpleAnimations && (
+        <div className="absolute inset-0">
+          <div className="absolute top-10 left-10 w-72 h-72 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
+          <div className="absolute top-10 right-10 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+          <div className="absolute -bottom-8 left-20 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+        </div>
+      )}
+      {shouldUseSimpleAnimations && (
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-purple-50 opacity-50"></div>
+      )}
 
       <motion.div
         className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10"
@@ -75,8 +99,8 @@ const Hero: React.FC = () => {
             target="_blank"
             rel="noopener noreferrer"
             className="text-3xl text-gray-700 hover:text-blue-600 transition-colors duration-300"
-            whileHover={{ scale: 1.2, rotate: 5 }}
-            whileTap={{ scale: 0.9 }}
+            whileHover={shouldUseSimpleAnimations ? { scale: 1.05 } : { scale: 1.2, rotate: 5 }}
+            whileTap={{ scale: 0.95 }}
           >
             <FaGithub />
           </motion.a>
@@ -85,16 +109,16 @@ const Hero: React.FC = () => {
             target="_blank"
             rel="noopener noreferrer"
             className="text-3xl text-gray-700 hover:text-blue-600 transition-colors duration-300"
-            whileHover={{ scale: 1.2, rotate: 5 }}
-            whileTap={{ scale: 0.9 }}
+            whileHover={shouldUseSimpleAnimations ? { scale: 1.05 } : { scale: 1.2, rotate: 5 }}
+            whileTap={{ scale: 0.95 }}
           >
             <FaLinkedin />
           </motion.a>
           <motion.a
             href="mailto:bhuvansbhuvan467@gmail.com"
             className="text-3xl text-gray-700 hover:text-blue-600 transition-colors duration-300"
-            whileHover={{ scale: 1.2, rotate: 5 }}
-            whileTap={{ scale: 0.9 }}
+            whileHover={shouldUseSimpleAnimations ? { scale: 1.05 } : { scale: 1.2, rotate: 5 }}
+            whileTap={{ scale: 0.95 }}
           >
             <FaEnvelope />
           </motion.a>
@@ -103,8 +127,8 @@ const Hero: React.FC = () => {
             target="_blank"
             rel="noopener noreferrer"
             className="text-3xl text-gray-700 hover:text-blue-600 transition-colors duration-300"
-            whileHover={{ scale: 1.2, rotate: 5 }}
-            whileTap={{ scale: 0.9 }}
+            whileHover={shouldUseSimpleAnimations ? { scale: 1.05 } : { scale: 1.2, rotate: 5 }}
+            whileTap={{ scale: 0.95 }}
           >
             <FaNpm />
           </motion.a>
@@ -132,14 +156,15 @@ const Hero: React.FC = () => {
           </motion.a>
         </motion.div>
 
+        {/* Scroll indicator - Remove infinite animation on mobile */}
         <motion.div
           className="mt-16"
-          animate={{
+          animate={shouldUseSimpleAnimations ? {} : {
             y: [0, -10, 0],
           }}
           transition={{
             duration: 2,
-            repeat: Infinity,
+            repeat: shouldUseSimpleAnimations ? 0 : Infinity,
             repeatType: "reverse",
           }}
         >
@@ -147,12 +172,12 @@ const Hero: React.FC = () => {
           <div className="w-6 h-10 border-2 border-gray-400 rounded-full mx-auto mt-2 relative">
             <motion.div
               className="w-1 h-3 bg-gray-400 rounded-full mx-auto"
-              animate={{
+              animate={shouldUseSimpleAnimations ? {} : {
                 y: [0, 12, 0],
               }}
               transition={{
                 duration: 1.5,
-                repeat: Infinity,
+                repeat: shouldUseSimpleAnimations ? 0 : Infinity,
                 repeatType: "reverse",
               }}
             />

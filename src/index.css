@@ -10,6 +10,19 @@
   body {
     font-family: 'Inter', system-ui, sans-serif;
   }
+
+  /* Respect user's motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+    
+    html {
+      scroll-behavior: auto;
+    }
+  }
 }
 
 @layer components {
@@ -28,6 +41,31 @@
   .section-padding {
     @apply py-20 px-4 sm:px-6 lg:px-8;
   }
+
+  /* Mobile optimized animations */
+  @media (max-width: 768px) {
+    .card-hover {
+      @apply hover:shadow-lg hover:-translate-y-1;
+    }
+    
+    .btn-primary {
+      @apply hover:shadow-md hover:translate-y-0;
+    }
+
+    /* Reduce blob animation complexity on mobile */
+    .animate-blob {
+      animation: blob-mobile 10s infinite;
+    }
+  }
+
+  /* Lightweight fade-in animation for mobile */
+  .fade-in-mobile {
+    animation: fadeInMobile 0.6s ease-out forwards;
+  }
+
+  .fade-in-mobile-delay {
+    animation: fadeInMobile 0.6s ease-out 0.2s forwards;
+  }
 }
 
 @keyframes blob {
@@ -42,6 +80,28 @@
   }
   100% {
     transform: translate(0px, 0px) scale(1);
+  }
+}
+
+/* Simplified blob animation for mobile */
+@keyframes blob-mobile {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  50% {
+    transform: translate(10px, -10px) scale(1.05);
+  }
+}
+
+/* Lightweight fade-in for mobile */
+@keyframes fadeInMobile {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 

@@ -1,25 +1,40 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FaMapMarkerAlt, FaPhone, FaEnvelope } from 'react-icons/fa';
 
 const About: React.FC = () => {
+  const [isMobile, setIsMobile] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  useEffect(() => {
+    setIsMobile(window.innerWidth <= 768);
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReducedMotion(mediaQuery.matches);
+
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const shouldUseSimpleAnimations = isMobile || prefersReducedMotion;
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.3,
+        staggerChildren: shouldUseSimpleAnimations ? 0.1 : 0.3,
       },
     },
   };
 
   const itemVariants = {
-    hidden: { y: 30, opacity: 0 },
+    hidden: { y: shouldUseSimpleAnimations ? 10 : 30, opacity: 0 },
     visible: {
       y: 0,
       opacity: 1,
       transition: {
-        duration: 0.5,
+        duration: shouldUseSimpleAnimations ? 0.3 : 0.5,
       },
     },
   };
@@ -31,7 +46,7 @@ const About: React.FC = () => {
         variants={containerVariants}
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true, amount: 0.3 }}
+        viewport={{ once: true, amount: shouldUseSimpleAnimations ? 0.1 : 0.3 }}
       >
         <motion.div className="text-center mb-16" variants={itemVariants}>
           <h2 className="text-4xl md:text-5xl font-bold mb-4">
@@ -44,7 +59,7 @@ const About: React.FC = () => {
           <motion.div variants={itemVariants}>
             <motion.div
               className="bg-gradient-to-br from-blue-100 to-purple-100 rounded-2xl p-8 relative overflow-hidden"
-              whileHover={{ scale: 1.02 }}
+              whileHover={shouldUseSimpleAnimations ? {} : { scale: 1.02 }}
               transition={{ duration: 0.3 }}
             >
               <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-300 to-purple-300 rounded-full -translate-y-16 translate-x-16 opacity-50"></div>

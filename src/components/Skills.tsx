@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   FaReact, 
@@ -22,6 +22,20 @@ import {
 } from 'react-icons/si';
 
 const Skills: React.FC = () => {
+  const [isMobile, setIsMobile] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  useEffect(() => {
+    setIsMobile(window.innerWidth <= 768);
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReducedMotion(mediaQuery.matches);
+
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const shouldUseSimpleAnimations = isMobile || prefersReducedMotion;
   const skillCategories = [
     {
       title: 'Frontend',
@@ -72,18 +86,18 @@ const Skills: React.FC = () => {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.2,
+        staggerChildren: shouldUseSimpleAnimations ? 0.05 : 0.2,
       },
     },
   };
 
   const itemVariants = {
-    hidden: { y: 30, opacity: 0 },
+    hidden: { y: shouldUseSimpleAnimations ? 10 : 30, opacity: 0 },
     visible: {
       y: 0,
       opacity: 1,
       transition: {
-        duration: 0.5,
+        duration: shouldUseSimpleAnimations ? 0.3 : 0.5,
       },
     },
   };
@@ -95,7 +109,7 @@ const Skills: React.FC = () => {
         variants={containerVariants}
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true, amount: 0.3 }}
+        viewport={{ once: true, amount: shouldUseSimpleAnimations ? 0.1 : 0.3 }}
       >
         <motion.div className="text-center mb-16" variants={itemVariants}>
           <h2 className="text-4xl md:text-5xl font-bold mb-4">
@@ -113,7 +127,7 @@ const Skills: React.FC = () => {
               key={category.title}
               className="bg-white p-6 rounded-xl shadow-lg card-hover"
               variants={itemVariants}
-              whileHover={{ y: -5 }}
+              whileHover={shouldUseSimpleAnimations ? {} : { y: -5 }}
             >
               <div className="flex items-center mb-6">
                 <div className="text-3xl mr-3">{category.icon}</div>
@@ -137,10 +151,10 @@ const Skills: React.FC = () => {
                         className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full"
                         initial={{ width: 0 }}
                         whileInView={{ width: `${skill.level}%` }}
-                        viewport={{ once: true }}
+                        viewport={{ once: true, amount: 0.5 }}
                         transition={{ 
-                          duration: 1, 
-                          delay: categoryIndex * 0.2 + skillIndex * 0.1 
+                          duration: shouldUseSimpleAnimations ? 0.5 : 1, 
+                          delay: shouldUseSimpleAnimations ? 0 : categoryIndex * 0.1 + skillIndex * 0.05
                         }}
                       />
                     </div>
